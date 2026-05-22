@@ -1,5 +1,5 @@
 // 경주월드 먹거리 가이드 - Service Worker
-const CACHE = "gyeongju-food-v3";
+const CACHE = "gyeongju-food-v4";
 const ASSETS = [
   "./",
   "./index.html",
