@@ -140,6 +140,8 @@
       color: #b91c1c;
       font-weight: 800;
       box-shadow: 0 10px 30px rgba(127,29,29,.08);
+      word-break: keep-all;
+      line-height: 1.45;
     }
 
     h1 {
@@ -224,6 +226,7 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      gap: 18px;
       overflow: hidden;
     }
 
@@ -250,6 +253,13 @@
       margin: 0;
       font-size: 34px;
       letter-spacing: -.06em;
+      word-break: keep-all;
+    }
+
+    .ticket-emoji {
+      font-size: 44px;
+      line-height: 1;
+      flex-shrink: 0;
     }
 
     .ticket small {
@@ -655,8 +665,17 @@
       .hero {
         padding: 44px 0 24px;
       }
+      h1 {
+        font-size: 36px;
+      }
       .ticket {
         min-height: 330px;
+      }
+      .ticket h2 {
+        font-size: 26px;
+      }
+      .ticket-emoji {
+        font-size: 30px;
       }
       .food-icons span {
         min-height: 62px;
@@ -716,7 +735,7 @@
                 <small>GYEONGJU WORLD FOOD PASS</small>
                 <h2>오늘의 먹거리 티켓</h2>
               </div>
-              <div style="font-size:44px">🎢</div>
+              <div class="ticket-emoji">🎢</div>
             </div>
             <div class="food-icons" aria-hidden="true">
               <span>🍔</span><span>🧋</span><span>🍟</span>
