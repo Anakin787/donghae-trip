@@ -1,0 +1,17 @@
+{
+  "name": "동해 여름 여행 · 2박 3일",
+  "short_name": "동해 여행",
+  "description": "2026.07.05~07 강원 동해·갈남·장호 여행 일정과 지도, 동선별 맛집 후보",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#fef8ec",
+  "theme_color": "#1b7e94",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

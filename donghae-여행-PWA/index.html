@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>동해 여름 여행 · 2박 3일</title>
+<meta name="description" content="2026.07.05~07 강원 동해·갈남·장호 여행 일정과 지도, 동선별 맛집 후보">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1b7e94">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="동해 여행">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+  :root{
+    --ink:#123642;--ink-soft:#4a6470;--sand:#fff;--line:#e7ecec;
+    --d1:#1b7e94;--d2:#f0734c;--d3:#1f9e82;--food:#e8961e;--gold:#f5b544;
+    --shadow:0 18px 40px -22px rgba(18,54,66,.45);--radius:22px;
+    font-family:"Pretendard Variable",Pretendard,-apple-system,system-ui,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{color:var(--ink);background:linear-gradient(180deg,#fef8ec 0%,#f4f4ea 26%,#e8f1ef 60%,#dcecef 100%);
+    background-attachment:fixed;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1080px;margin:0 auto;padding:0 20px 64px}
+
+  /* kakao in-app bar */
+  #kakao-bar{position:sticky;top:0;z-index:1200;background:#fee500;color:#3c1e1e;
+    display:none;align-items:center;gap:12px;justify-content:center;padding:11px 16px;font-size:13px;font-weight:700}
+  #kakao-bar.show{display:flex}
+  #kakao-bar button{font-family:inherit;font-weight:800;border:none;background:#3c1e1e;color:#fee500;
+    border-radius:9px;padding:8px 13px;cursor:pointer}
+
+  /* hero */
+  .hero{position:relative;overflow:hidden;padding:54px 20px 96px}
+  .hero-inner{max-width:1080px;margin:0 auto;position:relative;z-index:2}
+  .sun{position:absolute;top:-70px;right:-40px;width:320px;height:320px;border-radius:50%;
+    background:radial-gradient(circle at 35% 35%,#ffe6a3,#f5b544 62%,rgba(245,181,68,0) 72%);opacity:.85;z-index:1;filter:blur(2px)}
+  .eyebrow{display:inline-block;font-size:12px;font-weight:700;letter-spacing:.42em;color:var(--d1);
+    text-transform:uppercase;background:rgba(255,255,255,.72);padding:7px 16px;border-radius:999px}
+  h1{font-size:clamp(38px,8vw,66px);font-weight:800;letter-spacing:-.02em;line-height:1.02;margin:18px 0 6px}
+  h1 .wave{display:inline-block;transform:translateY(6px)}
+  .meta{display:flex;flex-wrap:wrap;align-items:center;gap:12px;margin-top:14px}
+  .pill{font-weight:800;font-size:14px;color:#fff;background:var(--d1);padding:8px 16px;border-radius:999px}
+  .pill.date{background:rgba(255,255,255,.9);color:var(--ink);border:1px solid var(--line)}
+  .pill.where{background:transparent;color:var(--ink-soft);font-weight:600;padding-left:2px}
+  .hero-wave{position:absolute;left:0;right:0;bottom:-2px;width:100%;height:90px;z-index:1}
+
+  .sec{margin-top:48px}
+  .sec-head{display:flex;align-items:baseline;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+  .sec-head h2{font-size:24px;font-weight:800;letter-spacing:-.01em}
+  .sec-head span{font-size:13px;color:var(--ink-soft);font-weight:600}
+
+  /* map */
+  .map-card{background:var(--sand);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line)}
+  .filters{display:flex;flex-wrap:wrap;gap:8px;padding:16px 16px 4px;align-items:center}
+  .chip{appearance:none;border:1.5px solid var(--line);background:#fff;color:var(--ink-soft);font-family:inherit;
+    font-weight:700;font-size:13px;padding:8px 16px;border-radius:999px;cursor:pointer;transition:all .18s ease}
+  .chip:hover{border-color:#cfd9da}
+  .chip.active{color:#fff;border-color:transparent}
+  .chip[data-day="all"].active{background:var(--ink)}
+  .chip[data-day="1"].active{background:var(--d1)}
+  .chip[data-day="2"].active{background:var(--d2)}
+  .chip[data-day="3"].active{background:var(--d3)}
+  .sep{width:1px;height:22px;background:var(--line);margin:0 4px}
+  #foodToggle.active{background:var(--food)}
+  #rainToggle.active{background:#5a7d8c}
+  .chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+  #map{height:480px;width:100%;background:#dfeef0}
+  .map-foot{display:flex;flex-wrap:wrap;gap:16px;padding:12px 18px;font-size:12.5px;color:var(--ink-soft);border-top:1px solid var(--line)}
+  .lg{display:inline-flex;align-items:center;gap:7px}
+  .dot{width:13px;height:13px;border-radius:50%;display:inline-block}
+
+  .pin{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:50% 50% 50% 2px;
+    transform:rotate(45deg);box-shadow:0 4px 10px -3px rgba(0,0,0,.4);border:2.5px solid #fff}
+  .pin b{transform:rotate(-45deg);color:#fff;font-size:13px;line-height:1;font-weight:800}
+  .fpin{display:flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;
+    background:var(--food);border:2.5px solid #fff;box-shadow:0 4px 10px -3px rgba(0,0,0,.4);font-size:13px}
+  .rpin{display:flex;align-items:center;justify-content:center;width:27px;height:27px;border-radius:50%;
+    background:#5a7d8c;border:2.5px solid #fff;box-shadow:0 4px 10px -3px rgba(0,0,0,.4);font-size:13px}
+  .leaflet-popup-content-wrapper{border-radius:16px;box-shadow:var(--shadow)}
+  .leaflet-popup-content{margin:0;width:236px!important}
+  .pop img{width:100%;height:128px;object-fit:cover;display:block}
+  .pop-body{padding:12px 14px 14px}
+  .pop-time{display:inline-block;font-size:11px;font-weight:800;color:#fff;padding:3px 9px;border-radius:999px;margin-bottom:7px}
+  .pop h4{font-size:15.5px;font-weight:800;margin-bottom:4px;color:var(--ink)}
+  .pop .rate{font-size:12px;font-weight:700;color:#b9791a;margin-bottom:5px}
+  .pop p{font-size:12.5px;color:var(--ink-soft);margin-bottom:10px}
+  .pop a{display:block;text-align:center;font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;
+    border:1.5px solid var(--line);border-radius:10px;padding:8px;transition:.15s}
+  .pop a:hover{background:#f3f7f7;border-color:#cfd9da}
+
+  /* timeline */
+  .days{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .day{background:var(--sand);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden;border:1px solid var(--line);display:flex;flex-direction:column}
+  .day-head{padding:18px 20px;color:#fff;position:relative}
+  .day1 .day-head{background:linear-gradient(135deg,#2a98ae,#1b7e94)}
+  .day2 .day-head{background:linear-gradient(135deg,#f78a5f,#f0734c)}
+  .day3 .day-head{background:linear-gradient(135deg,#2cb495,#1f9e82)}
+  .day-head .kicker{font-size:11px;font-weight:800;letter-spacing:.22em;opacity:.85}
+  .day-head .dnum{font-size:22px;font-weight:800;margin-top:2px}
+  .day-head .tag{position:absolute;top:18px;right:18px;font-size:11px;font-weight:800;background:rgba(255,255,255,.22);padding:5px 11px;border-radius:999px}
+  .steps{list-style:none;padding:16px 18px 20px;flex:1}
+  .step{position:relative;padding:7px 0 7px 26px;font-size:14.5px}
+  .step::before{content:"";position:absolute;left:5px;top:15px;width:9px;height:9px;border-radius:50%;background:#cdd8d9}
+  .step:not(:last-child)::after{content:"";position:absolute;left:9px;top:24px;bottom:-2px;width:2px;background:#eef2f2}
+  .day1 .step.on::before{background:var(--d1)}
+  .day2 .step.on::before{background:var(--d2)}
+  .day3 .step.on::before{background:var(--d3)}
+  .step.food-step::before{background:var(--food)}
+  .step.pin-step{cursor:pointer;border-radius:10px;margin-left:-6px;padding-left:32px;transition:background .15s}
+  .step.pin-step:hover{background:#f4f8f8}
+  .step.pin-step:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+  .step .t{font-weight:800}
+  .step.opt{color:var(--ink-soft)}
+  .step .badge{display:inline-block;font-size:10px;font-weight:800;color:#fff;border-radius:6px;padding:1px 6px;margin-left:6px;vertical-align:1.5px}
+  .day1 .step .badge{background:var(--d1)}
+  .day2 .step .badge{background:var(--d2)}
+  .day3 .step .badge{background:var(--d3)}
+  .cands{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+  .cands a{font-size:12px;font-weight:700;color:#8a5a12;background:#fff6e6;border:1px solid #f1e0bd;border-radius:999px;
+    padding:4px 11px;text-decoration:none;cursor:pointer;transition:.15s}
+  .cands a:hover{background:#fdedcf}
+  .cands a:focus-visible{outline:3px solid var(--gold);outline-offset:1px}
+  .sub{display:block;font-size:12px;color:var(--ink-soft);margin-top:3px}
+  .note{margin:0 18px 18px;background:#fbf3e8;border:1px solid #f1e3cf;border-radius:14px;padding:12px 14px;font-size:13px;color:#7a5a2e}
+  .note b{color:var(--d2)}
+
+  /* info */
+  .info{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+  .panel{background:var(--sand);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);padding:22px 24px}
+  .panel h3{font-size:17px;font-weight:800;margin-bottom:16px;display:flex;align-items:center;gap:9px}
+  .leg{font-size:13px;font-weight:800;color:var(--ink);margin:4px 0 10px}
+  .leg.ret{color:var(--ink-soft)}
+  .train{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:10px 0;border-top:1px dashed var(--line)}
+  .train:first-of-type{border-top:none}
+  .tno{font-size:12px;font-weight:800;color:#fff;background:var(--d1);padding:5px 10px;border-radius:8px;white-space:nowrap}
+  .train.r .tno{background:#0f4c5c}
+  .troute{font-size:13.5px;font-weight:600}
+  .tprice{font-size:13.5px;font-weight:800;color:var(--d2);white-space:nowrap}
+  .ssub{margin-top:14px;font-size:12.5px;color:var(--ink-soft)}
+  .group{margin-bottom:16px}
+  .group .glab{font-size:13.5px;font-weight:800;margin-bottom:9px;display:flex;align-items:center;gap:8px}
+  .people{display:flex;flex-wrap:wrap;gap:7px}
+  .person{font-size:13px;font-weight:700;background:#eef4f4;color:var(--ink);padding:6px 13px;border-radius:999px}
+
+  .stay{margin-top:18px;background:linear-gradient(135deg,#16606f,#0f4c5c);color:#fff;border-radius:var(--radius);
+    box-shadow:var(--shadow);padding:24px 26px;display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+  .stay .ico{width:58px;height:58px;border-radius:16px;background:rgba(255,255,255,.16);display:grid;place-items:center;font-size:28px;flex-shrink:0}
+  .stay .txt{flex:1;min-width:200px}
+  .stay h3{font-size:20px;font-weight:800;margin-bottom:4px}
+  .stay p{font-size:13.5px;color:rgba(255,255,255,.82)}
+  .stay a{font-weight:800;font-size:14px;color:#0f4c5c;background:#fff;padding:12px 22px;border-radius:12px;text-decoration:none;transition:.15s}
+  .stay a:hover{transform:translateY(-1px);box-shadow:0 8px 18px -8px rgba(0,0,0,.4)}
+
+  .foot{text-align:center;margin-top:34px;font-size:13px;color:var(--ink-soft)}
+  .foot b{color:var(--d2)}
+
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+  .plan{background:var(--sand);border-radius:var(--radius);box-shadow:var(--shadow);border:1px solid var(--line);overflow:hidden;display:flex;flex-direction:column}
+  .plan-head{padding:16px 18px;color:#fff}
+  .plan-a .plan-head{background:linear-gradient(135deg,#2a98ae,#1b7e94)}
+  .plan-b .plan-head{background:linear-gradient(135deg,#f0b54c,#e0892a)}
+  .plan-c .plan-head{background:linear-gradient(135deg,#6f93a3,#4f6f7e)}
+  .plan-head .pk{font-size:11px;font-weight:800;letter-spacing:.16em;opacity:.92}
+  .plan-head .pt{font-size:18px;font-weight:800;margin-top:3px}
+  .plan-head .pc{font-size:12px;opacity:.92;margin-top:3px}
+  .plist{list-style:none;padding:14px 16px 8px;flex:1}
+  .plist li{position:relative;padding:9px 0 9px 25px;font-size:14px;border-bottom:1px solid #f1f5f5}
+  .plist li:last-child{border-bottom:none}
+  .plist .num{position:absolute;left:0;top:11px;width:18px;height:18px;border-radius:50%;color:#fff;font-size:10px;font-weight:800;display:grid;place-items:center}
+  .plan-a .num{background:#1b7e94}.plan-b .num{background:#e0892a}.plan-c .num{background:#4f6f7e}
+  .plist a{color:inherit;text-decoration:none;font-weight:700;border-bottom:1.5px dotted #b9c6c9;cursor:pointer}
+  .plist a:hover{border-bottom-style:solid}
+  .plist .muted{color:var(--ink-soft);font-size:12px;display:block;margin-top:4px}
+  .plan-tip{margin:6px 16px 16px;font-size:12px;color:var(--ink-soft);background:#f5f8f8;border-radius:10px;padding:9px 11px}
+  @media(max-width:860px){.days{grid-template-columns:1fr}.info{grid-template-columns:1fr}.plans{grid-template-columns:1fr}}
+  @media(max-width:520px){.train{grid-template-columns:auto 1fr;row-gap:4px}.tprice{grid-column:2;justify-self:end}#map{height:400px}}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div id="kakao-bar">
+  <span>카톡 인앱 브라우저예요. 지도가 잘 안 보이면 →</span>
+  <button id="kakao-open">기본 브라우저로 열기</button>
+</div>
+
+<header class="hero">
+  <div class="sun" aria-hidden="true"></div>
+  <div class="hero-inner">
+    <span class="eyebrow">Summer Trip · Donghae</span>
+    <h1>동해 여름 여행 <span class="wave">🌊</span></h1>
+    <div class="meta">
+      <span class="pill">2박 3일</span>
+      <span class="pill date">2026. 07. 05 (일) → 07. 07 (화)</span>
+      <span class="pill where">강원 동해 · 갈남 · 장호</span>
+    </div>
+  </div>
+  <svg class="hero-wave" viewBox="0 0 1440 90" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0,48 C240,90 480,10 720,40 C960,70 1200,18 1440,46 L1440,90 L0,90 Z" fill="#ffffff" opacity=".55"/>
+    <path d="M0,62 C240,30 480,86 720,58 C960,30 1200,84 1440,58 L1440,90 L0,90 Z" fill="#e3f2f4"/>
+  </svg>
+</header>
+
+<main class="wrap">
+
+  <section class="sec" id="map-sec">
+    <div class="sec-head">
+      <h2>🗺️ 여행 지도</h2>
+      <span>핀을 누르면 상세·위치, 일정표 장소를 눌러도 지도가 이동해요</span>
+    </div>
+    <div class="map-card">
+      <div class="filters" role="group" aria-label="지도 필터">
+        <button class="chip active" data-day="all">전체</button>
+        <button class="chip" data-day="1">DAY 1</button>
+        <button class="chip" data-day="2">DAY 2</button>
+        <button class="chip" data-day="3">DAY 3</button>
+        <span class="sep"></span>
+        <button class="chip active" id="foodToggle">🍴 맛집</button>
+        <button class="chip" id="rainToggle">🌧️ 우천</button>
+      </div>
+      <div id="map"></div>
+      <div class="map-foot">
+        <span class="lg"><span class="dot" style="background:#1b7e94"></span>DAY 1</span>
+        <span class="lg"><span class="dot" style="background:#f0734c"></span>DAY 2</span>
+        <span class="lg"><span class="dot" style="background:#1f9e82"></span>DAY 3</span>
+        <span class="lg"><span class="dot" style="background:#e8961e"></span>맛집·장보기</span>
+        <span class="lg"><span class="dot" style="background:#5a7d8c"></span>우천 대안</span>
+        <span class="lg">( ) 표시는 날씨에 따라 생략 가능</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>📅 일정표</h2><span>현장 상황에 맞춰 유동적으로 운영</span></div>
+    <div class="days">
+
+      <article class="day day1">
+        <div class="day-head"><span class="tag">도착</span><div class="kicker">DAY 1</div><div class="dnum">7/5 일</div></div>
+        <ul class="steps">
+          <li class="step on pin-step" tabindex="0" data-place="donghae-stn"><span class="t">13:36</span> 동해역 도착 · 렌트카 픽업<span class="badge">지도</span></li>
+          <li class="step food-step">🍚 점심 식사
+            <div class="cands"><a data-place="f1">담다</a><a data-place="f2">홍대포</a></div></li>
+          <li class="step on pin-step" tabindex="0" data-place="pension">체크인 · 짐 풀기<span class="badge">지도</span></li>
+          <li class="step on pin-step" tabindex="0" data-place="haslla">하슬라 아트월드<span class="badge">지도</span></li>
+          <li class="step opt on pin-step" tabindex="0" data-place="jeongdongjin">( 정동진 )<span class="badge">지도</span></li>
+          <li class="step food-step">🛒 장보기 — 저녁은 펜션에서 거하게! 🍖
+            <div class="cands"><a data-place="f3">하나로마트 청운점</a></div></li>
+        </ul>
+      </article>
+
+      <article class="day day2">
+        <div class="day-head"><span class="tag">메인</span><div class="kicker">DAY 2</div><div class="dnum">7/6 월</div></div>
+        <ul class="steps">
+          <li class="step on"><span class="t">10~12시</span> 느긋하게 기상</li>
+          <li class="step on pin-step" tabindex="0" data-place="galnam">갈남 / 장호 스노클링 🤿<span class="badge">지도</span>
+            <span class="sub">두 곳 다 핀이 있어요 · <a class="cands-inline" data-place="jangho" style="color:#f0734c;font-weight:700">장호해변 보기</a></span></li>
+          <li class="step opt on pin-step" tabindex="0" data-place="mureung">( 무릉계곡 )<span class="badge">지도</span></li>
+          <li class="step opt on pin-step" tabindex="0" data-place="cablecar">( 레일바이크 / 해상케이블카 )<span class="badge">지도</span></li>
+          <li class="step food-step">🐟 회 + 술 한잔
+            <div class="cands"><a data-place="f4">묵호항 회센터</a><a data-place="f5">영기횟집 (장호)</a></div></li>
+        </ul>
+      </article>
+
+      <article class="day day3">
+        <div class="day-head"><span class="tag">마무리</span><div class="kicker">DAY 3</div><div class="dnum">7/7 화</div></div>
+        <ul class="steps">
+          <li class="step on">기상</li>
+          <li class="step on pin-step" tabindex="0" data-place="pension">체크아웃<span class="badge">지도</span></li>
+          <li class="step food-step">🍚 점심 식사
+            <div class="cands"><a data-place="f6">동해바다곰치국</a><a data-place="f7">거북이횟집</a></div></li>
+          <li class="step on pin-step" tabindex="0" data-place="donghae-stn">집으로 🏡 (동해역)<span class="badge">지도</span></li>
+        </ul>
+      </article>
+
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="sec-head"><h2>🌧️ Day 2 날씨별 플랜</h2><span>7/6(월) 비 예보 · 우선순위 높은 것만</span></div>
+    <div class="plans">
+      <article class="plan plan-a">
+        <div class="plan-head"><div class="pk">PLAN A</div><div class="pt">☀️ 맑음 (원안)</div><div class="pc">바다 그대로 즐기기</div></div>
+        <ul class="plist">
+          <li><span class="num">1</span><a data-place="galnam">갈남·장호 스노클링</a> 🤿</li>
+          <li><span class="num">2</span><a data-place="cablecar">삼척 해상케이블카</a> · (무릉계곡)</li>
+          <li><span class="num">3</span><a data-place="f4">회 + 술 한잔</a> 🍶</li>
+        </ul>
+      </article>
+      <article class="plan plan-b">
+        <div class="plan-head"><div class="pk">PLAN B</div><div class="pt">🌦️ 비 조금</div><div class="pc">바다 잔잔하면 강행</div></div>
+        <ul class="plist">
+          <li><span class="num">1</span><a data-place="galnam">스노클링</a> — 파도 잔잔할 때 짧게<span class="muted">풍랑·번개 있으면 바로 취소</span></li>
+          <li><span class="num">2</span><a data-place="cablecar">해상케이블카</a> — 곤돌라라 비와도 운영</li>
+          <li><span class="num">3</span><a data-place="f4">회 + 술 한잔</a></li>
+        </ul>
+        <div class="plan-tip">무릉계곡은 증수 위험 → 제외</div>
+      </article>
+      <article class="plan plan-c">
+        <div class="plan-head"><div class="pk">PLAN C</div><div class="pt">🌧️ 비 많이</div><div class="pc">스노클링 취소 · 실내 위주</div></div>
+        <ul class="plist">
+          <li><span class="num">1</span><a data-place="hwanseon">삼척 환선굴</a> — 대형 석회동굴(연중 10~14℃) 🕳️</li>
+          <li><span class="num">2</span><a data-place="nongol">묵호 논골담길</a> — 바다뷰 카페거리 ☕</li>
+          <li><span class="num">3</span><a data-place="f4">회 + 술 한잔</a></li>
+        </ul>
+        <div class="plan-tip">천곡동굴은 폭우 시 침수로 폐쇄될 수 있어 환선굴 우선</div>
+      </article>
+    </div>
+  </section>
+
+  <section class="sec">
+    <div class="info">
+      <div class="panel">
+        <h3>🚄 교통편</h3>
+        <div class="leg">▶ 가는 길 · 7/5 (일) 서울 → 동해</div>
+        <div class="train"><span class="tno">KTX-이음 843</span><span class="troute">서울 10:59 → 동해 13:36 · 8·9호차</span><span class="tprice">31,300원</span></div>
+        <div class="leg ret" style="margin-top:16px">◀ 오는 길 · 7/7 (화) 동해 → 서울</div>
+        <div class="train r"><span class="tno">KTX-이음 840</span><span class="troute">동해 07:05 → 서울 09:49</span><span class="tprice">31,300원</span></div>
+        <div class="train r"><span class="tno">KTX-이음 844</span><span class="troute">동해 14:02 → 서울 16:39</span><span class="tprice">31,300원</span></div>
+      </div>
+      <div class="panel">
+        <h3>👬 탑승 / 인원</h3>
+        <div class="group">
+          <div class="glab">🚗 테슬라</div>
+          <div class="people"><span class="person">태욱</span><span class="person">현우 (딸기)</span><span class="person">원준</span><span class="person">태현</span></div>
+        </div>
+        <div class="group">
+          <div class="glab">🚄 KTX 10:59 (8·9호차)</div>
+          <div class="people"><span class="person">지운</span><span class="person">한을</span><span class="person">승희</span><span class="person">준호</span><span class="person">승환</span><span class="person">형진</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stay">
+    <div class="ico" aria-hidden="true">🏨</div>
+    <div class="txt">
+      <h3>동해황토민박펜션</h3>
+      <p>강원 동해시 · 동해역에서 차로 약 10분 · 3일 내내 베이스캠프</p>
+    </div>
+    <a href="https://map.naver.com/p/search/동해황토민박펜션" target="_blank" rel="noopener" data-ext>네이버 지도에서 열기 →</a>
+  </div>
+
+  <p class="foot">( ) 표시는 <b>날씨에 따라 생략 가능</b> · 맛집은 후보예요, 인원·취향대로 골라요</p>
+
+</main>
+
+<script>
+  /* ---------- 데이터 ---------- */
+  const P = {
+    "donghae-stn":{n:1,name:"동해역",days:[1,3],color:"#1b7e94",lat:37.498192,lng:129.123803,
+      time:"DAY 1 · 13:36 / DAY 3 복귀",note:"KTX-이음 843 도착 후 테슬라 픽업. 복귀는 840·844편.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZN4_iZr0XiWB0J-v9lSBVQI2PEqqVRqX6cZz1Ke9-ZKfJrq1gTtPwgopfpN87JBXAJ1u5Hyv7fMpUhBNPasmOnEmXOeIeMj0QJVs7-OHnGCNYIW-aw-n3qiPvqcH20rCYNBYxu7kjhGEFGGig=w400-h300"},
+    "pension":{n:2,name:"동해황토민박펜션",days:[1,3],color:"#1b7e94",lat:37.5083546,lng:129.0958347,
+      time:"체크인 / 체크아웃",note:"숙소 베이스캠프. 동해역에서 차로 약 10분.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZMNEZva1EXZ8y3KWBI170dBIjZX-PQ0tQVeCpqakzy5NIyMidyNVBTSvzftGDd7u1v1FL0XZxEicgEJyUltxr_cyQRVdcyrK0HS56-dZz4Tok5_IjQjnYmAMgm7pRMcz1vZ1jVrAuIqXpDzz1Q=w400-h300"},
+    "haslla":{n:3,name:"하슬라 아트월드",days:[1],color:"#1b7e94",lat:37.7065101,lng:129.0099078,
+      time:"DAY 1 · 16:00",note:"바다 전망 조각공원. 운영 09:00~18:00. 펜션에서 차로 약 35분.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZMTXS4zcSFDSdfL5Mb5khwzgxojK-9UPRD03BdNBP7ghn1ygB3qXH2ZYVzsdodgp9fYy0a1MlWI8__a5awLaVFQ_zuSIdY-aUMNd_h8mG-yPV3_cy4LeALe0mkCArBQV6HtG4uO0GRbU4dGU-dfITpwiw=w400-h300"},
+    "jeongdongjin":{n:4,name:"정동진",days:[1],color:"#1b7e94",opt:true,lat:37.6918842,lng:129.0213872,
+      time:"DAY 1 · 옵션",note:"하슬라 바로 옆. 해변·바다열차 포토존. 날씨 따라 생략 가능.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZONeJ3rVJyQR6Lk_BN_V4OVURmTSKZqk5ELFeXhBB8MsiYALj4CAR62F7GEFtgP4bGa9WZgs6AB9eSij0cBJXEwBV31WWhsZCU-bvaALmilDTLSMtuFgE1LS3RdOQF8kHlw5FsXRGXpgFvzh9Y=w400-h300"},
+    "galnam":{n:5,name:"갈남(신남)해변 스노클링",days:[2],color:"#f0734c",lat:37.2657303,lng:129.3269348,
+      time:"DAY 2 · 12:30",note:"맑고 한적한 스노클링 명소. 펜션에서 차로 약 40~50분.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZOw_gGW_5hwiod8bY6vzgZQXqK4PH2_HVm26hH58h09h2iGD9bC4RTBLHNDY74deRYVYcgaIf057UgAu3b05VbGiN1tNsKhYJkx5iswlpqsuSqfYATLL_wgvjKJGi5XQKm94hKoN5HHde1n=w400-h300"},
+    "jangho":{n:6,name:"장호해변 스노클링",days:[2],color:"#f0734c",lat:37.2858858,lng:129.3141444,
+      time:"DAY 2 · 14:30",note:"'한국의 나폴리'. 물이 맑아 스노클링 최적. 갈남 바로 위.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZNWorrmFCfhUJ8o2h2_AUc1V1SpvThshOpLv_iIa9GIOFOz8qgbkIdyEmkjAlkYOa5lz52rQYJMnigeQypPUXsR0tKKMDH2jES4PwEdcdcs37OOQN_AHmFC2oWIM4k8GKKcRXI4UX3fLYKDIkE=w400-h300"},
+    "cablecar":{n:7,name:"삼척 해상케이블카 (장호역)",days:[2],color:"#f0734c",opt:true,lat:37.288326,lng:129.3185805,
+      time:"DAY 2 · 옵션",note:"장호 해변 바로 옆. 화요일 휴무 / 월요일 운영(~17시).",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZO2Hee6WKooQKZLn63KAdipa2GZzRvScUogXsriRlTpdK_a7JGHfWkkmJggKpewvn1BIXHNyCKphpxh9iZG1sIJP3PwKbZmCOf57wft1T3RJyxXPLXAt_SWVJakiOLDtbRNk3hKzeWtWLSq=w400-h300"},
+    "mureung":{n:8,name:"무릉계곡",days:[2],color:"#f0734c",opt:true,lat:37.4631021,lng:129.0193183,
+      time:"DAY 2 · 옵션",note:"동해 안쪽 계곡. 삼척 복귀 동선과 반대편이라 여유 있을 때만.",
+      photo:"https://lh3.googleusercontent.com/place-photos/AJRVUZN2-S7OkDLUtbldZgZSEeX1Iq171I13bRweBxSH3qaa91pm4XZZaw6FyfZAHVIFS5ekqKzky0C-2AN_E-xLAYfRym3x0mozuEJqIWoTOxmSzpC4nHm4CKNvN5KXM1K9OJZDZOy1f6u9MbFuvK4=w400-h300"}
+  };
+  const F = {
+    "f1":{name:"담다",day:1,cat:"점심",glyph:"🍚",lat:37.4848344,lng:129.1006345,r:4.4,c:149,note:"한식 정식·곤드레밥 맛집. 11:00~21:00, 수요일 휴무(7/5 일요일 영업)."},
+    "f2":{name:"홍대포",day:1,cat:"점심",glyph:"🍲",lat:37.5145209,lng:129.1199913,r:4.2,c:689,note:"해물탕·해신탕. 매일 11:30~22:00. 끝에 죽/칼국수 추천."},
+    "f3":{name:"동해농협하나로마트 청운점",day:1,cat:"장보기",glyph:"🛒",lat:37.4864948,lng:129.1113747,r:4.1,c:49,note:"넓은 대형 농협마트. 저녁 장보기. 영업시간은 당일 확인 권장."},
+    "f4":{name:"묵호항활어회센터",day:2,cat:"회",glyph:"🐟",lat:37.5526049,lng:129.1154015,r:3.8,c:569,note:"묵호항 활어회. 즉석에서 회 떠 먹는 시장 분위기."},
+    "f5":{name:"영기횟집",day:2,cat:"회",glyph:"🐟",lat:37.2868579,lng:129.3163431,r:3.5,c:383,note:"장호항 바닷가 회·생선구이·회덮밥. 스노클링 직후 먹기 좋음."},
+    "f6":{name:"동해바다곰치국",day:3,cat:"점심",glyph:"🍜",lat:37.5583941,lng:129.1206706,r:3.7,c:506,note:"동해 별미 곰치국·물회. 묵호항 인근(북쪽 약 10분)."},
+    "f7":{name:"거북이횟집곰치국",day:3,cat:"점심",glyph:"🍜",lat:37.5583161,lng:129.1208379,r:4.4,c:13,note:"곰치국 전문. 묵호항 일출로."}
+  };
+  const R = {
+    "hwanseon":{name:"삼척 환선굴",day:2,glyph:"🕳️",lat:37.324521,lng:129.0081751,r:4.5,c:1959,note:"국내 최대 석회동굴. 연중 10~14℃라 비와 무관. 모노레일+도보 15분, 동굴 안 물방울 떨어져 우비 추천. 08:00~18:00."},
+    "cheongok":{name:"천곡황금박쥐동굴",day:2,glyph:"🦇",lat:37.517365,lng:129.1102094,r:4.3,c:2651,note:"숙소에서 차로 약 5분, 도심 동굴. 09:00~18:00. 폭우 시 침수로 폐쇄될 수 있어 당일 확인 필요."},
+    "nongol":{name:"묵호 논골담길",day:2,glyph:"☕",lat:37.5547934,lng:129.1189737,r:4.4,c:637,note:"묵호항 언덕 벽화골목+바다뷰 카페거리. 회 자리(묵호항) 바로 옆이라 비 피하며 시간 보내기 좋음."}
+  };
+  const ROUTES = {1:["donghae-stn","pension","haslla","jeongdongjin"],2:["pension","galnam","jangho","cablecar","mureung"],3:["pension","donghae-stn"]};
+  const COLORS = {1:"#1b7e94",2:"#f0734c",3:"#1f9e82"};
+
+  /* ---------- 카톡 인앱 브라우저 처리 ---------- */
+  const UA = navigator.userAgent.toLowerCase();
+  const inKakao = UA.indexOf("kakaotalk") !== -1;
+  function openExternal(url){
+    if(inKakao){ location.href = "kakaotalk://web/openExternal?url=" + encodeURIComponent(url); return; }
+    window.open(url,"_blank","noopener");
+  }
+  if(inKakao){
+    document.getElementById("kakao-bar").classList.add("show");
+    document.getElementById("kakao-open").addEventListener("click",()=>openExternal(location.href));
+  }
+  // 외부 링크(data-ext)는 카톡에서 기본 브라우저로 열기
+  document.addEventListener("click",e=>{
+    const a=e.target.closest("a[data-ext]");
+    if(a && inKakao){ e.preventDefault(); openExternal(a.href); }
+  });
+
+  /* ---------- 지도 ---------- */
+  const map = L.map("map",{scrollWheelZoom:false,zoomControl:true});
+  const OSM="https://tile.openstreetmap.org/{z}/{x}/{y}.png";
+  const CARTO="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png";
+  let tiles=L.tileLayer(OSM,{attribution:'&copy; OpenStreetMap',maxZoom:19}).addTo(map);
+  let switched=false;
+  tiles.on("tileerror",()=>{ if(switched)return; switched=true; map.removeLayer(tiles);
+    tiles=L.tileLayer(CARTO,{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19,subdomains:"abcd"}).addTo(map);});
+
+  function naver(name){return "https://map.naver.com/p/search/"+encodeURIComponent(name);}
+  function placePopup(p){
+    return `<div class="pop"><img src="${p.photo}" alt="${p.name}" loading="lazy">
+      <div class="pop-body"><span class="pop-time" style="background:${p.color}">${p.time}</span>
+      <h4>${p.opt?"( "+p.name+" )":p.name}</h4><p>${p.note}</p>
+      <a href="${naver(p.name.split("(")[0].trim())}" target="_blank" rel="noopener" data-ext>네이버 지도에서 열기 →</a></div></div>`;
+  }
+  function foodPopup(f){
+    return `<div class="pop"><div class="pop-body">
+      <span class="pop-time" style="background:var(--food)">${f.cat} 후보</span>
+      <h4>${f.glyph} ${f.name}</h4><div class="rate">⭐ ${f.r} · 리뷰 ${f.c.toLocaleString()}</div>
+      <p>${f.note}</p>
+      <a href="${naver(f.name)}" target="_blank" rel="noopener" data-ext>네이버 지도에서 열기 →</a></div></div>`;
+  }
+  function rainPopup(x){
+    return `<div class="pop"><div class="pop-body">
+      <span class="pop-time" style="background:#5a7d8c">우천 대안</span>
+      <h4>${x.glyph} ${x.name}</h4><div class="rate">⭐ ${x.r} · 리뷰 ${x.c.toLocaleString()}</div>
+      <p>${x.note}</p>
+      <a href="${naver(x.name)}" target="_blank" rel="noopener" data-ext>네이버 지도에서 열기 →</a></div></div>`;
+  }
+
+  const mk={};
+  Object.entries(P).forEach(([id,p])=>{
+    mk[id]=L.marker([p.lat,p.lng],{icon:L.divIcon({className:"",iconSize:[30,30],iconAnchor:[15,28],popupAnchor:[0,-26],
+      html:`<div class="pin" style="background:${p.color}"><b>${p.n}</b></div>`})}).bindPopup(placePopup(p));
+  });
+  Object.entries(F).forEach(([id,f])=>{
+    mk[id]=L.marker([f.lat,f.lng],{icon:L.divIcon({className:"",iconSize:[27,27],iconAnchor:[13,13],popupAnchor:[0,-15],
+      html:`<div class="fpin">${f.glyph}</div>`})}).bindPopup(foodPopup(f));
+  });
+  Object.entries(R).forEach(([id,x])=>{
+    mk[id]=L.marker([x.lat,x.lng],{icon:L.divIcon({className:"",iconSize:[27,27],iconAnchor:[13,13],popupAnchor:[0,-15],
+      html:`<div class="rpin">${x.glyph}</div>`})}).bindPopup(rainPopup(x));
+  });
+
+  let routeLine=null, foodOn=true, rainOn=false;
+  function activeDay(){const c=document.querySelector('.chip[data-day].active');return c?c.dataset.day:"all";}
+  function render(day){
+    Object.values(mk).forEach(m=>map.removeLayer(m));
+    if(routeLine){map.removeLayer(routeLine);routeLine=null;}
+    const pIds = day==="all" ? Object.keys(P) : Object.keys(P).filter(id=>P[id].days.includes(+day));
+    const fIds = !foodOn ? [] : (day==="all" ? Object.keys(F) : Object.keys(F).filter(id=>F[id].day===+day));
+    const rIds = !rainOn ? [] : (day==="all" ? Object.keys(R) : Object.keys(R).filter(id=>R[id].day===+day));
+    const pts=[];
+    pIds.forEach(id=>{mk[id].addTo(map);pts.push([P[id].lat,P[id].lng]);});
+    fIds.forEach(id=>{mk[id].addTo(map);pts.push([F[id].lat,F[id].lng]);});
+    rIds.forEach(id=>{mk[id].addTo(map);pts.push([R[id].lat,R[id].lng]);});
+    if(day!=="all"){
+      const seq=ROUTES[+day].filter(id=>P[id]).map(id=>[P[id].lat,P[id].lng]);
+      routeLine=L.polyline(seq,{color:COLORS[+day],weight:3.5,opacity:.85,dashArray:"2,9",lineCap:"round"}).addTo(map);
+    }
+    if(pts.length) map.fitBounds(pts,{padding:[55,55],maxZoom:13});
+  }
+
+  document.querySelectorAll(".chip[data-day]").forEach(c=>{
+    c.addEventListener("click",()=>{
+      document.querySelectorAll(".chip[data-day]").forEach(x=>x.classList.remove("active"));
+      c.classList.add("active"); render(c.dataset.day);
+    });
+  });
+  document.getElementById("foodToggle").addEventListener("click",function(){
+    foodOn=!foodOn; this.classList.toggle("active",foodOn); render(activeDay());
+  });
+  document.getElementById("rainToggle").addEventListener("click",function(){
+    rainOn=!rainOn; this.classList.toggle("active",rainOn); render(activeDay());
+  });
+
+  function goTo(id){
+    const isF=id in F, isR=id in R;
+    const day = isF?String(F[id].day) : isR?String(R[id].day) : String(P[id].days[0]);
+    document.querySelectorAll(".chip[data-day]").forEach(x=>x.classList.toggle("active",x.dataset.day===day));
+    if(isF && !foodOn){foodOn=true; document.getElementById("foodToggle").classList.add("active");}
+    if(isR && !rainOn){rainOn=true; document.getElementById("rainToggle").classList.add("active");}
+    render(day);
+    document.getElementById("map-sec").scrollIntoView({behavior:"smooth",block:"start"});
+    const o = isF?F[id] : isR?R[id] : P[id];
+    setTimeout(()=>{map.setView([o.lat,o.lng],13,{animate:true});mk[id].openPopup();},520);
+  }
+  document.querySelectorAll("[data-place]").forEach(el=>{
+    el.addEventListener("click",e=>{e.preventDefault();goTo(el.dataset.place);});
+    if(el.classList.contains("pin-step")) el.addEventListener("keydown",e=>{
+      if(e.key==="Enter"||e.key===" "){e.preventDefault();goTo(el.dataset.place);}});
+  });
+
+  render("all");
+  setTimeout(()=>map.invalidateSize(),300);
+  window.addEventListener("load",()=>setTimeout(()=>map.invalidateSize(),250));
+  if(window.ResizeObserver){new ResizeObserver(()=>map.invalidateSize()).observe(document.getElementById("map"));}
+
+  /* ---------- PWA ---------- */
+  if("serviceWorker" in navigator){
+    window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+  }
+</script>
+</body>
+</html>
